@@ -29,7 +29,11 @@ const app = express();
 app.use(cors())
 app.use(bodyParser.json());
 
+<<<<<<< HEAD
 app.get('/', (req, res)=> { res.send('it is working') })
+=======
+app.get('/', (req, res)=> { res.send(db.users) })
+>>>>>>> d08fed52071ad80efea1bb7f67dbb79f766e184a
 
 //Revisit 'Code Review' video for details about cleaning this up even further//
 
@@ -44,7 +48,12 @@ app.put('/image', (req, res) => { image.handleImage(req, res, db)})
 app.post('/imageurl', (req, res) => { image.handleApiCall(req, res)})
 
 
+<<<<<<< HEAD
 app.listen(process.env.PORT || 3000, ()=> {
 	console.log(`app is running on port ${process.env.PORT}`);
+=======
+app.listen(3000, ()=> {
+	console.log('app is running on port 3000');
+>>>>>>> d08fed52071ad80efea1bb7f67dbb79f766e184a
 })
 
