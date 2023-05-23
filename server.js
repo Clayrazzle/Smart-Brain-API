@@ -29,11 +29,7 @@ const app = express();
 app.use(cors())
 app.use(bodyParser.json());
 
-<<<<<<< HEAD
 app.get('/', (req, res)=> { res.send('it is working') })
-=======
-app.get('/', (req, res)=> { res.send(db.users) })
->>>>>>> d08fed52071ad80efea1bb7f67dbb79f766e184a
 
 //Revisit 'Code Review' video for details about cleaning this up even further//
 
