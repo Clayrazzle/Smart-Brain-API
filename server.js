@@ -9,7 +9,7 @@ const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 
-const db = knex({
+/*const db = knex({
   client: 'pg',
   connection: {
     host : '127.0.0.1',
@@ -17,6 +17,17 @@ const db = knex({
     user : 'Clayrazzle',
     password : '',
     database : 'smart-brain'
+  }
+});*/
+
+const db = knex({
+  client: 'pg',
+  connection: {
+    host : 'dpg-chu5pufdvk4olivgr8vg-a',
+    port : 5432,
+    user : 'smart_brain_fgvz_user',
+    password : 'dwaXZy96kHMk9lAopu7OgVG9UACynYya',
+    database : 'smart_brain_fgvz'
   }
 });
 
