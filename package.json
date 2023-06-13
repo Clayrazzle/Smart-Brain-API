@@ -1,12 +1,11 @@
 {
   "name": "smart-brain-api",
   "version": "1.0.0",
-  "homepage": "https://clayrazzle.github.io/Smart-Brain-API",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "start:dev": "nodemon server.js"
+    /*"start": "node server.js"*/
+    "start": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
