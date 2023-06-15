@@ -2,62 +2,46 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
-const knex = require('knex')
+const knex = require('knex');
 
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 
-/*const db = knex({
+const db = knex({
+  // connect to your own database here:
   client: 'pg',
   connection: {
     host : '127.0.0.1',
-    port : 5432,
     user : 'Clayrazzle',
     password : '',
     database : 'smart-brain'
   }
-});*/
-
-const db = knex({
-  client: 'pg',
-  connection: {
-    host : process.env.DATABASE_HOST,
-    port : 5432,
-    user : process.env.DATABASE_USER,
-    password : process.env.DATABASE_PW,
-    database : process.env.DATABASE_DB
-  }
 });
 
 db.select('*').from('users').then(data => {
-	console.log(data);
+  console.log(data);
 });
 
 const app = express();
 
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/', (req, res)=> { res.send('it is working') })
+app.get('/', (req, res) => { res.send('it is working'); });
 
+app.post('/signin', signin.handleSignin(db, bcrypt));
 
-//Revisit 'Code Review' video for details about cleaning this up even further//
+app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt); });
 
-app.post('/signin', signin.handleSignin(db, bcrypt))
+app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db); });
 
-app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })
+app.put('/image', (req, res) => { image.handleImage(req, res, db); });
 
-app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db)})
+app.post('/imageurl', (req, res) => { image.handleApiCall(req, res); });
 
-app.put('/image', (req, res) => { image.handleImage(req, res, db)})
-
-app.post('/imageurl', (req, res) => { image.handleApiCall(req, res)})
-
-
-
-app.listen(process.env.PORT || 3000, () => {
-  const port = process.env.PORT || 3000;
-  console.log(`app is running on port ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`app is running on port ${PORT}`);
 });
