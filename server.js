@@ -13,10 +13,13 @@ const db = knex({
   // connect to your own database here:
   client: 'pg',
   connection: {
-    host : '127.0.0.1',
-    user : 'Clayrazzle',
-    password : '',
-    database : 'smart-brain'
+    connectionString: process.env.DATABASE_URL,
+    ssl : {rejectUnauthorized: false },
+    host: process.env.DATABASE_HOST,
+    port: 5432,
+    user : process.env.DATABASE_USER,
+    password : process.env.DATABASE_PW,
+    database : process.env.DATABASE_DB
   }
 });
 
@@ -30,16 +33,24 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => { res.send('it is working'); });
-
 app.post('/signin', signin.handleSignin(db, bcrypt));
-
 app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt); });
-
 app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db); });
-
 app.put('/image', (req, res) => { image.handleImage(req, res, db); });
-
 app.post('/imageurl', (req, res) => { image.handleApiCall(req, res); });
+
+// Add the test route below
+app.get('/test', (req, res) => {
+  db.select('*')
+    .from('users')
+    .then(data => {
+      res.json({ success: true, data });
+    })
+    .catch(error => {
+      console.error('Error retrieving data:', error);
+      res.status(500).json({ success: false, error: 'Failed to retrieve data' });
+    });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
