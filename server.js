@@ -30,7 +30,26 @@ app.use(express.json()); // latest version of exressJS now comes with Body-Parse
 
 app.get('/', (req, res)=> { res.send(db.users) })
 app.post('/signin', signin.handleSignin(db, bcrypt))
-app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })
+/*app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })*/
+
+app.post('/register', (req, res) => {
+  const { name, email, password } = req.body;
+
+  // Hash the password
+  const hashedPassword = bcrypt.hashSync(password);
+
+  // Insert the new user into the database
+  db('users')
+    .insert({ name, email, password: hashedPassword })
+    .then(() => {
+      res.json('Registration successful');
+    })
+    .catch((error) => {
+      console.error('Error registering user:', error);
+      res.status(500).json({ success: false, error: 'Failed to register user' });
+    });
+});
+
 app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db)})
 app.put('/image', (req, res) => { image.handleImage(req, res, db)})
 app.post('/imageurl', (req, res) => { image.handleApiCall(req, res)})
