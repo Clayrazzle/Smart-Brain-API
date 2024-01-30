@@ -26,16 +26,16 @@ const db = knex({
 const app = express();
 
 app.use(cors());
-app.use(express.json()); // latest version of exressJS now comes with Body-Parser!
+app.use(express.json()); 
 
 app.post('/signin', signin.handleSignin(db, bcrypt));
 app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt); });
 app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db); });
 app.put('/image', (req, res) => { image.handleImage(req, res, db); });
 app.post('/imageurl', (req, res) => { image.handleApiCall(req, res); });
-app.get('/', (req, res) => { res.send(db.users); }); // Place the catch-all route at the end
+app.get('/', (req, res) => { res.send(db.users); }); 
 
-// Add the test route below
+
 app.get('/test', (req, res) => {
   db.select('*')
     .from('users')
@@ -48,7 +48,19 @@ app.get('/test', (req, res) => {
     });
 });
 
-const port = process.env.PORT || 3000; // Use the provided port or default to 3000
+
+app.get('/test-db-connection', async (req, res) => {
+  try {
+    const client = await db.raw('SELECT 1');
+    res.json({ success: true, message: 'Database connection successful' });
+  } catch (error) {
+    console.error('Error connecting to the database:', error);
+    res.status(500).json({ success: false, error: 'Database connection failed' });
+  }
+});
+
+
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`App is running on port ${port}`);
 });
