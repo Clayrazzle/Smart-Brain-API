@@ -2,8 +2,8 @@ const fetch = require("node-fetch");
 
 // Store your Clarifai Personal Access Token (PAT) in Render environment variables
 const PAT = process.env.CLARIFAI_API_KEY;   // set this in Render → Environment
-const USER_ID = "your_user_id";             // from Clarifai portal
-const APP_ID = "your_app_id";               // from Clarifai portal
+const USER_ID = "clay_r_smith";             // from Clarifai portal
+const APP_ID = "smart-brain";               // from Clarifai portal
 const MODEL_ID = "face-detection";          // Clarifai's face detection model
 
 // Call Clarifai API
