@@ -2,7 +2,9 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const knex = require('knex');
+const { ClarifaiStub, grpc } = require('clarifai-nodejs-grpc');
 
+// Controllers
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
@@ -22,21 +24,50 @@ const db = knex({
   }
 });
 
-const app = express();
+// Clarifai setup
+const stub = ClarifaiStub.grpc();
+const metadata = new grpc.Metadata();
+metadata.set("authorization", "Key 17edf5a4d12d4d3b9e553fe654586d9a"); // 🔑 Replace with your actual key
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
 // Routes
-app.get('/', (req, res) => { res.send('Server is running'); });
+app.get('/', (req, res) => res.send('Server is running'));
 
 app.post('/signin', signin.handleSignin(db, bcrypt));
-app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt); });
-app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db); });
-app.put('/image', (req, res) => { image.handleImage(req, res, db); });
-app.post('/imageurl', (req, res) => { image.handleApiCall(req, res); });
+app.post('/register', (req, res) => register.handleRegister(req, res, db, bcrypt));
+app.get('/profile/:id', (req, res) => profile.handleProfileGet(req, res, db));
+app.put('/image', (req, res) => image.handleImage(req, res, db));
 
-// Debug/test routes (optional)
+// ✅ Fixed Clarifai face detection route
+app.post('/imageurl', (req, res) => {
+  stub.PostModelOutputs(
+    {
+      model_id: "face-detection",
+      inputs: [
+        {
+          data: {
+            image: {
+              url: req.body.input
+            }
+          }
+        }
+      ]
+    },
+    metadata,
+    (err, response) => {
+      if (err || response.status.code !== 10000) {
+        console.error("Clarifai API error:", err || response.status.description);
+        return res.status(400).json("Unable to work with API");
+      }
+      res.json(response);
+    }
+  );
+});
+
+// Optional debug routes
 app.get('/test', (req, res) => {
   db.select('*').from('users')
     .then(data => res.json({ success: true, data }))

@@ -1,6 +1,5 @@
 const fetch = require("node-fetch");
 
-// Store your Clarifai Personal Access Token (PAT) in Render environment variables
 const PAT = process.env.CLARIFAI_API_KEY;   // set this in Render → Environment
 const USER_ID = "clay_r_smith";             // from Clarifai portal
 const APP_ID = "smart-brain";               // from Clarifai portal
