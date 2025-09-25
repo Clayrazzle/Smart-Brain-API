@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const knex = require('knex');
-const { ClarifaiStub, grpc } = require('clarifai-nodejs-grpc');
+const fetch = require('node-fetch'); // ✅ Use REST API instead of gRPC
 
 // Controllers
 const register = require('./controllers/register');
@@ -24,11 +24,6 @@ const db = knex({
   }
 });
 
-// Clarifai setup
-const stub = ClarifaiStub.grpc();
-const metadata = new grpc.Metadata();
-metadata.set("authorization", "Key 17edf5a4d12d4d3b9e553fe654586d9a"); // 🔑 Replace with your actual key
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -41,30 +36,38 @@ app.post('/register', (req, res) => register.handleRegister(req, res, db, bcrypt
 app.get('/profile/:id', (req, res) => profile.handleProfileGet(req, res, db));
 app.put('/image', (req, res) => image.handleImage(req, res, db));
 
-// ✅ Fixed Clarifai face detection route
-app.post('/imageurl', (req, res) => {
-  stub.PostModelOutputs(
-    {
-      model_id: "face-detection",
-      inputs: [
-        {
-          data: {
-            image: {
-              url: req.body.input
+// ✅ Clarifai REST API integration
+app.post('/imageurl', async (req, res) => {
+  try {
+    const raw = await fetch('https://api.clarifai.com/v2/models/face-detection/outputs', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Key 17edf5a4d12d4d3b9e553fe654586d9a', // ✅ Your actual API key
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        inputs: [
+          {
+            data: {
+              image: {
+                url: req.body.input
+              }
             }
           }
-        }
-      ]
-    },
-    metadata,
-    (err, response) => {
-      if (err || response.status.code !== 10000) {
-        console.error("Clarifai API error:", err || response.status.description);
-        return res.status(400).json("Unable to work with API");
-      }
-      res.json(response);
+        ]
+      })
+    });
+
+    const data = await raw.json();
+    if (data.status.code !== 10000) {
+      console.error("Clarifai API error:", data.status.description);
+      return res.status(400).json("Unable to work with API");
     }
-  );
+    res.json(data);
+  } catch (error) {
+    console.error("Clarifai fetch error:", error);
+    res.status(500).json("API call failed");
+  }
 });
 
 // Optional debug routes
