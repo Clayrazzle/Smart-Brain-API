@@ -36,27 +36,35 @@ app.post('/register', (req, res) => register.handleRegister(req, res, db, bcrypt
 app.get('/profile/:id', (req, res) => profile.handleProfileGet(req, res, db));
 app.put('/image', (req, res) => image.handleImage(req, res, db));
 
-// ✅ Clarifai REST API route
+// ✅ Clarifai REST API route with debug logs
 app.post('/imageurl', async (req, res) => {
   try {
-    const raw = await fetch('https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Key ${process.env.CLARIFAI_API_KEY}`, // 🔑 Replace with your actual key
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        inputs: [
-          {
-            data: {
-              image: {
-                url: req.body.input
+    // Debug logs
+    console.log("Image URL received:", req.body.input);
+    console.log("API key present?", !!process.env.CLARIFAI_API_KEY);
+    console.log("First 6 chars of key:", process.env.CLARIFAI_API_KEY?.slice(0, 6));
+
+    const raw = await fetch(
+      'https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Key ${process.env.CLARIFAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          inputs: [
+            {
+              data: {
+                image: {
+                  url: req.body.input
+                }
               }
             }
-          }
-        ]
-      })
-    });
+          ]
+        })
+      }
+    );
 
     const data = await raw.json();
     if (data.status.code !== 10000) {
