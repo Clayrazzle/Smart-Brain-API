@@ -42,7 +42,7 @@ app.post('/imageurl', async (req, res) => {
     const raw = await fetch('https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs', {
       method: 'POST',
       headers: {
-        'Authorization': 'Key 17edf5a4d12d4d3b9e553fe654586d9a', // 🔑 Replace with your actual key
+        'Authorization': `Key ${process.env.CLARIFAI_API_KEY}`, // 🔑 Replace with your actual key
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
