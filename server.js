@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const knex = require('knex');
-const fetch = require('node-fetch'); // ✅ Use REST API instead of gRPC
+const fetch = require('node-fetch'); // ✅ REST API support
 
 // Controllers
 const register = require('./controllers/register');
@@ -36,13 +36,13 @@ app.post('/register', (req, res) => register.handleRegister(req, res, db, bcrypt
 app.get('/profile/:id', (req, res) => profile.handleProfileGet(req, res, db));
 app.put('/image', (req, res) => image.handleImage(req, res, db));
 
-// ✅ Clarifai REST API integration
+// ✅ Clarifai REST API route
 app.post('/imageurl', async (req, res) => {
   try {
-    const raw = await fetch('https://api.clarifai.com/v2/models/face-detection/outputs', {
+    const raw = await fetch('https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs', {
       method: 'POST',
       headers: {
-        'Authorization': 'Key 17edf5a4d12d4d3b9e553fe654586d9a', // ✅ Your actual API key
+        'Authorization': 'Key 17edf5a4d12d4d3b9e553fe654586d9a', // 🔑 Replace with your actual key
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
